@@ -62,6 +62,7 @@ namespace FluentValidation.DependencyInjection {
 			context.RootContextData["_FV_ServiceProvider"] = serviceProvider;
 		}
 
+		
 		/// <summary>
 		/// Uses the Service Provider to inject the default validator for the property type.
 		/// </summary>
@@ -71,11 +72,23 @@ namespace FluentValidation.DependencyInjection {
 		/// <typeparam name="TProperty"></typeparam>
 		/// <returns></returns>
 		public static IRuleBuilderOptions<T, TProperty> InjectValidator<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, params string[] ruleSets) {
+			return ruleBuilder.InjectValidator((s, ctx) => s.GetService<IValidator<TProperty>>(), ruleSets);
+		}
+
+		/// <summary>
+		/// Uses the Service Provider to inject the default validator for the property type.
+		/// </summary>
+		/// <param name="ruleBuilder"></param>
+		/// <param name="callback"></param>
+		/// <param name="ruleSets"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="TProperty"></typeparam>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> InjectValidator<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, Func<IServiceProvider, ValidationContext<T>, IValidator<TProperty>> callback, params string[] ruleSets) {
 			var adaptor = new ChildValidatorAdaptor(context => {
 				var actualContext = (PropertyValidatorContext) context;
 				var serviceProvider = actualContext.ParentContext.GetServiceProvider();
-				var validatorFactory = serviceProvider.GetService<IValidatorFactory>();
-				var validator = validatorFactory.GetValidator<TProperty>();
+				var validator = callback(serviceProvider, (ValidationContext<T>) context.ParentContext);
 				return validator;
 			}, typeof(IValidator<TProperty>));
 
