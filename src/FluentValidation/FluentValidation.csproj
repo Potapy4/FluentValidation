@@ -5,6 +5,9 @@
     <PackageReleaseNotes>
 FluentValidation 8 is a major release. Please read the upgrade notes at https://fluentvalidation.net/upgrading-to-8
 
+Changes in 8.5.1:
+* Fixes to regex-based email validation.
+
 Changes in 8.5.0:
 * Add additional overload of the EmailAddress validator for compatibility with ASP.NET Core's default email validation.
 * Simplify the advanced testhelper syntax.
